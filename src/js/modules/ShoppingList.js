@@ -25,9 +25,33 @@ class ShoppingList {
     let listItem = document.createElement('li');
 
     listItem.classList.add('add-to-card__item');
+    listItem.id = key;
+    listItem.textContent = value;
+
+    return listItem;
+  }
+
+  createElementForEmptyList() {
+    let emptyElement = document.querySelector('.add-to-card__empty-list');
+
+    if (!emptyElement) {
+      emptyElement = document.createElement('span');
+      emptyElement.classList.add('add-to-card__empty-list');
+      emptyElement.textContent = 'Your shopping list is empty';
+
+      this.shoppingListElement.appendChild(emptyElement);
+      this.shoppingListElement.style.display = 'none';
+    }
   }
 
   // Methods to Clear/Delete
+  clearInputFieldElement() {
+    this.inputFieldElement.value = '';
+  }
+
+  clearShoppingListElement() {
+    this.shoppingListElement.innerHTML = '';
+  }
 
   // Methods to Render List
 
