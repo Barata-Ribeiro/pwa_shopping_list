@@ -2,6 +2,7 @@
 
 @import './App.css';
 @import './ShoppingList.css';
+@import './Modal.css';
 
 :root {
   --font-headings: 'Noto Serif', serif;

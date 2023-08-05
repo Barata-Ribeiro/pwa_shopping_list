@@ -4,6 +4,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 class ShoppingList {
   constructor() {
+    this.mainContainer = document.querySelector('.add-to-cart__container');
     this.loginButtonElement = document.querySelector('#login-button');
     this.logoutButtonElement = document.querySelector('#logout-button');
     this.inputFieldElement = document.querySelector('#input-field');
@@ -11,6 +12,12 @@ class ShoppingList {
     this.addButtonElement.disabled = true;
     this.errorMessageElement = document.querySelector('#error-message');
     this.shoppingListElement = document.querySelector('#shopping-list');
+
+    this.modalContainer = document.querySelector('#error-modal-container');
+    this.modalErrorMessage = document.querySelector('#modal-error-message');
+    this.modalCloseButton = document.querySelector(
+      '.error-modal__close-button',
+    );
 
     // Firebase Properties
     this.firebaseConfig = {
@@ -74,15 +81,23 @@ class ShoppingList {
       });
     } catch (error) {
       // Handle any errors that occurred during sign-in.
-      console.error('Error during sign-in: ', error);
+      this.displayErrorMessage(
+        'Error during sign-in. Please try again later.',
+        error,
+      );
     }
   }
 
   async logout() {
     try {
       await this.firebaseAuth.signOut();
+      const emptyElement = document.querySelector('.add-to-cart__empty-list');
+      if (emptyElement) emptyElement.remove();
     } catch (error) {
-      console.error('Error during sign-out: ', error);
+      this.displayErrorMessage(
+        'Error during sign-out. Please try again later.',
+        error,
+      );
     }
   }
 
@@ -103,16 +118,29 @@ class ShoppingList {
     if (!emptyElement) {
       emptyElement = document.createElement('span');
       emptyElement.classList.add('add-to-cart__empty-list');
-      emptyElement.textContent = 'Your shopping list is empty';
+      emptyElement.textContent = 'Your shopping list is empty!';
 
-      this.shoppingListElement.appendChild(emptyElement);
+      this.mainContainer.appendChild(emptyElement);
       this.shoppingListElement.style.display = 'none';
     }
 
     this.clearShoppingListElement();
   }
 
+  displayErrorMessage(message, error) {
+    const errorMessage = error
+      ? `${message} Error details: ${error.message}`
+      : message;
+    this.modalErrorMessage.textContent = errorMessage;
+    this.modalContainer.style.display = 'block';
+  }
+
   // Methods to Clear/Delete
+
+  closeModal() {
+    this.modalContainer.style.display = 'none';
+  }
+
   clearInputFieldElement() {
     this.inputFieldElement.value = '';
   }
@@ -136,7 +164,10 @@ class ShoppingList {
       );
 
       remove(locationOfItemInDB).catch((error) => {
-        console.error('Error removing item: ', error);
+        this.displayErrorMessage(
+          'Error removing item. Please try again later.',
+          error,
+        );
       });
     }
   }
@@ -159,9 +190,7 @@ class ShoppingList {
       push(this.firebaseShoppingListRef, inputValue);
       this.clearInputFieldElement();
     } else {
-      console.error(
-        'User not logged in: firebaseShoppingListRef is not defined',
-      );
+      this.displayErrorMessage('User not logged in.');
     }
   }
 
@@ -170,11 +199,6 @@ class ShoppingList {
       onValue(this.firebaseShoppingListRef, (snapshot) => {
         if (snapshot.exists()) {
           const snapshotData = snapshot.val();
-          const emptyElement = document.querySelector(
-            '.add-to-cart__empty-list',
-          );
-
-          if (emptyElement) this.shoppingListElement.style.display = 'none';
           this.shoppingListElement.innerHTML = '';
           this.shoppingListElement.style.display = 'flex';
 
@@ -189,10 +213,19 @@ class ShoppingList {
 
             this.shoppingListElement.appendChild(newListItem);
           }
-        } else this.createElementForEmptyList();
+
+          const emptyElement = document.querySelector(
+            '.add-to-cart__empty-list',
+          );
+          if (emptyElement) emptyElement.remove();
+        } else {
+          this.shoppingListElement.innerHTML = '';
+          this.shoppingListElement.style.display = 'none';
+          this.createElementForEmptyList();
+        }
       });
     } else {
-      console.error('firebaseShoppingListRef is not defined');
+      this.displayErrorMessage('firebaseShoppingListRef is not defined');
     }
   }
 
@@ -204,6 +237,9 @@ class ShoppingList {
       this.deleteItemsFromShoppingList.bind(this);
     this.loginWithGoogle = this.loginWithGoogle.bind(this);
     this.logout = this.logout.bind(this);
+
+    this.closeModal = this.closeModal.bind(this);
+    this.displayErrorMessage = this.displayErrorMessage.bind(this);
   }
 
   addEventListeners() {
@@ -224,6 +260,10 @@ class ShoppingList {
     this.logoutButtonElement.addEventListener('click', async () => {
       await this.logout();
     });
+
+    if (this.modalCloseButton) {
+      this.modalCloseButton.addEventListener('click', this.closeModal);
+    }
   }
 }
 

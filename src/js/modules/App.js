@@ -62,6 +62,23 @@ class App {
     listEl.id = 'shopping-list';
     mainContainer.appendChild(listEl);
 
+    // Error Modal Element
+    const errorModalEl = document.createElement('div');
+    errorModalEl.className = 'error-modal__container';
+    errorModalEl.id = 'error-modal-container';
+    const errorModalDiv = document.createElement('div');
+    errorModalDiv.className = 'error-modal__content';
+    errorModalEl.appendChild(errorModalDiv);
+    const errorModalCloseButton = document.createElement('span');
+    errorModalCloseButton.className = 'error-modal__close-button';
+    errorModalCloseButton.textContent = '&times;';
+    errorModalDiv.appendChild(errorModalCloseButton);
+    const errorModalP = document.createElement('p');
+    errorModalP.className = 'error-modal__text';
+    errorModalP.id = 'modal-error-message';
+    errorModalP.textContent = '';
+    errorModalDiv.appendChild(errorModalP);
+
     return mainContainer;
   }
 
