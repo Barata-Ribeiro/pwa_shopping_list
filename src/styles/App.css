@@ -16,7 +16,6 @@
 .add-to-cart__button {
   font-family: var(--font-headings);
   display: block;
-  margin-inline: auto;
   width: 100%;
   text-align: center;
   font-size: 2rem;
@@ -41,13 +40,17 @@
   background-color: var(--secondary-support);
 }
 
-.add-to-card__list {
+.add-to-cart__list {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
 }
 
-.add-to-card__empty-list,
+.add-to-cart__error {
+  display: none;
+}
+
+.add-to-cart__empty-list,
 .add-to-cart__error {
   color: var(--primary);
   font-size: 1.2rem;

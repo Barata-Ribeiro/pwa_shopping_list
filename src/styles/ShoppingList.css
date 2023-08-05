@@ -1,4 +1,4 @@
-.add-to-card__item {
+.add-to-cart__item {
   cursor: pointer;
   font-size: 2rem;
   flex-grow: 1;
@@ -10,6 +10,6 @@
   box-shadow: 0 0.1rem 0.4rem rgba(0, 0, 0, 0.2);
 }
 
-.add-to-card__item:hover {
+.add-to-cart__item:hover {
   background-color: var(--secondary);
 }

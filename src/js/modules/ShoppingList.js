@@ -25,7 +25,7 @@ class ShoppingList {
   static createShoppingListElement(value, key) {
     const listItem = document.createElement('li');
 
-    listItem.classList.add('add-to-card__item');
+    listItem.classList.add('add-to-cart__item');
     listItem.id = key;
     listItem.textContent = value;
 
@@ -33,11 +33,11 @@ class ShoppingList {
   }
 
   createElementForEmptyList() {
-    let emptyElement = document.querySelector('.add-to-card__empty-list');
+    let emptyElement = document.querySelector('.add-to-cart__empty-list');
 
     if (!emptyElement) {
       emptyElement = document.createElement('span');
-      emptyElement.classList.add('add-to-card__empty-list');
+      emptyElement.classList.add('add-to-cart__empty-list');
       emptyElement.textContent = 'Your shopping list is empty';
 
       this.shoppingListElement.appendChild(emptyElement);
@@ -96,7 +96,7 @@ class ShoppingList {
     onValue(this.firebaseShoppingListRef, (snapshot) => {
       if (snapshot.exists()) {
         const snapshotData = snapshot.val();
-        const emptyElement = document.querySelector('.add-to-card__empty-list');
+        const emptyElement = document.querySelector('.add-to-cart__empty-list');
 
         if (emptyElement) this.shoppingListElement.style.display = 'none';
         this.shoppingListElement.innerHTML = '';
