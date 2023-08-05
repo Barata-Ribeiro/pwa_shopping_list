@@ -8,5 +8,5 @@ import ShoppingList from './modules/ShoppingList';
 const myApp = new App('app');
 myApp.render();
 
-const myShoppingList = new ShoppingList();
-myShoppingList.renderShoppingList();
+// eslint-disable-next-line no-new
+new ShoppingList();

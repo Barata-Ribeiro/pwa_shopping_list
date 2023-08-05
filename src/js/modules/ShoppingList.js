@@ -1,23 +1,68 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, push, onValue, remove } from 'firebase/database';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 class ShoppingList {
   constructor() {
+    this.loginButtonElement = document.querySelector('#login-button');
     this.inputFieldElement = document.querySelector('#input-field');
     this.addButtonElement = document.querySelector('#add-button');
+    this.addButtonElement.disabled = true;
     this.errorMessageElement = document.querySelector('#error-message');
     this.shoppingListElement = document.querySelector('#shopping-list');
 
     // Firebase Properties
     this.firebaseConfig = {
-      databaseURL: import.meta.env.FIREBASE_DATABASE_URL,
+      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
     };
     this.firebaseApp = initializeApp(this.firebaseConfig);
     this.firebaseDatabase = getDatabase(this.firebaseApp);
-    this.firebaseShoppingListRef = ref(this.firebaseDatabase, 'shoppingList');
+    this.firebaseShoppingListRef = null;
+    this.firebaseAuth = getAuth();
+    this.firebaseAuth.onAuthStateChanged((user) => {
+      if (user) {
+        this.userId = user.uid;
+        this.firebaseShoppingListRef = ref(
+          this.firebaseDatabase,
+          `users/${this.userId}/shoppingList`,
+        );
+        this.renderShoppingList();
+        this.addButtonElement.disabled = false;
+      } else {
+        this.clearShoppingListElement();
+        this.addButtonElement.disabled = true;
+      }
+    });
 
     this.bindMethods();
     this.addEventListeners();
+  }
+
+  async loginWithGoogle() {
+    const provider = new GoogleAuthProvider();
+    const auth = getAuth();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const { user } = result;
+
+      this.userId = user.uid;
+      this.firebaseShoppingListRef = ref(
+        this.firebaseDatabase,
+        `users/${this.userId}/shoppingList`,
+      );
+
+      // Wait for firebaseShoppingListRef to be defined before rendering
+      Promise.resolve(this.firebaseShoppingListRef).then(() => {
+        this.renderShoppingList();
+      });
+    } catch (error) {
+      // Handle any errors that occurred during sign-in.
+      console.error('Error during sign-in: ', error);
+    }
   }
 
   // Methods to Create
@@ -63,14 +108,15 @@ class ShoppingList {
 
   deleteItemsFromShoppingList(event) {
     event.preventDefault();
-
-    if (event.target && event.target.nodeName === 'li') {
+    if (event.target && event.target.nodeName === 'LI') {
       const locationOfItemInDB = ref(
         this.firebaseDatabase,
-        `shoppingList/${event.target.id}`,
+        `users/${this.userId}/shoppingList/${event.target.id}`,
       );
 
-      remove(locationOfItemInDB);
+      remove(locationOfItemInDB).catch((error) => {
+        console.error('Error removing item: ', error);
+      });
     }
   }
 
@@ -88,34 +134,45 @@ class ShoppingList {
       return;
     }
 
-    this.clearErrorMessageElement();
-    push(this.firebaseShoppingListRef, inputValue);
-    this.clearInputFieldElement();
+    if (this.firebaseShoppingListRef) {
+      push(this.firebaseShoppingListRef, inputValue);
+      this.clearInputFieldElement();
+    } else {
+      console.error(
+        'User not logged in: firebaseShoppingListRef is not defined',
+      );
+    }
   }
 
   renderShoppingList() {
-    onValue(this.firebaseShoppingListRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const snapshotData = snapshot.val();
-        const emptyElement = document.querySelector('.add-to-cart__empty-list');
-
-        if (emptyElement) this.shoppingListElement.style.display = 'none';
-        this.shoppingListElement.innerHTML = '';
-        this.shoppingListElement.style.display = 'flex';
-
-        const itemsArray = Object.entries(snapshotData);
-
-        for (let i = 0; i < itemsArray.length; i += 1) {
-          const [key, value] = itemsArray[i];
-          const newListItem = ShoppingList.createShoppingListElement(
-            value,
-            key,
+    if (this.firebaseShoppingListRef) {
+      onValue(this.firebaseShoppingListRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const snapshotData = snapshot.val();
+          const emptyElement = document.querySelector(
+            '.add-to-cart__empty-list',
           );
 
-          this.shoppingListElement.appendChild(newListItem);
-        }
-      } else this.createElementForEmptyList();
-    });
+          if (emptyElement) this.shoppingListElement.style.display = 'none';
+          this.shoppingListElement.innerHTML = '';
+          this.shoppingListElement.style.display = 'flex';
+
+          const itemsArray = Object.entries(snapshotData);
+
+          for (let i = 0; i < itemsArray.length; i += 1) {
+            const [key, value] = itemsArray[i];
+            const newListItem = ShoppingList.createShoppingListElement(
+              value,
+              key,
+            );
+
+            this.shoppingListElement.appendChild(newListItem);
+          }
+        } else this.createElementForEmptyList();
+      });
+    } else {
+      console.error('firebaseShoppingListRef is not defined');
+    }
   }
 
   // Events and Bindings
@@ -124,9 +181,11 @@ class ShoppingList {
     this.clearErrorMessageElement = this.clearErrorMessageElement.bind(this);
     this.deleteItemsFromShoppingList =
       this.deleteItemsFromShoppingList.bind(this);
+    this.loginWithGoogle = this.loginWithGoogle.bind(this);
   }
 
   addEventListeners() {
+    this.addButtonElement.disabled = true;
     this.addButtonElement.addEventListener(
       'click',
       this.addItemsToShoppingList,
@@ -139,6 +198,7 @@ class ShoppingList {
       'click',
       this.deleteItemsFromShoppingList,
     );
+    this.loginButtonElement.addEventListener('click', this.loginWithGoogle);
   }
 }
 

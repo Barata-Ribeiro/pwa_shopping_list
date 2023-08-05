@@ -8,6 +8,14 @@ class App {
     const mainContainer = document.createElement('main');
     mainContainer.className = 'add-to-cart__container';
 
+    // Login Button Element
+    const loginButtonEl = document.createElement('button');
+    loginButtonEl.className = 'login__button';
+    loginButtonEl.id = 'login-button';
+    loginButtonEl.type = 'button';
+    loginButtonEl.textContent = 'Login with Google';
+    mainContainer.appendChild(loginButtonEl);
+
     // Image Element
     const imageEl = document.createElement('img');
     imageEl.className = 'add-to-cart__image';
