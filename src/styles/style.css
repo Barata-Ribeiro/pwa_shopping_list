@@ -14,15 +14,19 @@
   --primary: hsl(349, 41%, 48%);
   --secondary: hsl(40, 100%, 89%);
   --secondary-support: hsl(29, 100%, 13%);
+  --neutral-white: hsl(0, 0%, 98%);
+  --neutral-gray: hsl(0, 0%, 90%);
   --accent: hsl(236, 21%, 44%);
 }
 
 .dark-theme {
   --text: hsl(220, 21%, 95%);
-  --background: hsl(243, 17%, 22%);
+  --background: hsl(230, 31%, 11%);
   --primary: hsl(349, 41%, 48%);
   --secondary: hsl(40, 100%, 9%);
   --secondary-support: hsl(40, 100%, 89%);
+  --neutral-white: hsl(0, 0%, 8%);
+  --neutral-gray: hsl(0, 0%, 10%);
   --accent: hsl(236, 22%, 74%);
 }
 
@@ -35,7 +39,7 @@ body {
   font-family: var(--font-texts);
   font-size: 1.6rem;
   line-height: 1.5;
-  color: var(--color-foreground);
-  background-color: var(--color-background);
+  color: var(--text);
+  background-color: var(--background);
   user-select: none;
 }

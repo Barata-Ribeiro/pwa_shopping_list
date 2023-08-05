@@ -26,7 +26,11 @@
 
 .add-to-cart__input {
   color: var(--text);
-  background-color: var(--background);
+  background-color: var(--neutral-gray);
+}
+
+.add-to-cart__input::placeholder {
+  color: var(--neutral-white);
 }
 
 .add-to-cart__button {

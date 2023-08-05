@@ -59,6 +59,7 @@ class ShoppingList {
   clearErrorMessageElement() {
     this.errorMessageElement.textContent = '';
     this.errorMessageElement.style.display = 'none';
+    this.inputFieldElement.style.border = 'initial';
   }
 
   deleteItemsFromShoppingList(event) {
@@ -83,7 +84,8 @@ class ShoppingList {
     if (inputValue === '') {
       this.clearErrorMessageElement();
       this.errorMessageElement.style.display = 'block';
-      this.errorMessageElement.textContent = 'Please enter a value';
+      this.errorMessageElement.textContent = 'Please enter a product.';
+      this.inputFieldElement.style.border = '0.2rem solid var(--primary)';
       return;
     }
 

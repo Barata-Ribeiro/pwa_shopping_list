@@ -6,10 +6,12 @@
   line-height: 1;
   padding: 1.6rem;
   border-radius: 0.8rem;
-  background-color: #fffdf8;
+  color: var(--secondary-support);
+  background-color: var(--secondary);
   box-shadow: 0 0.1rem 0.4rem rgba(0, 0, 0, 0.2);
 }
 
 .add-to-cart__item:hover {
-  background-color: var(--secondary);
+  color: var(--secondary);
+  background-color: var(--secondary-support);
 }
