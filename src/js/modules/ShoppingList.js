@@ -94,9 +94,34 @@ class ShoppingList {
     this.clearInputFieldElement();
   }
 
+  renderShoppingList() {
+    onValue(this.firebaseShoppingListRef, (snapshot) => {
+      if (snapshot.exists()) {
+        let snapshotData = snapshot.val();
+        const emptyElement = document.querySelector('.add-to-card__empty-list');
+
+        if (emptyElement) this.shoppingListElement.style.display = 'none';
+        this.shoppingListElement.innerHTML = '';
+        this.shoppingListElement.style.display = 'flex';
+
+        let itemsArray = Object.entries(snapshotData);
+
+        for (let i = 0; i < itemsArray.length; i += 1) {
+          let [key, value] = itemsArray[i];
+          let newListItem = this.createShoppingListElement(value, key);
+
+          this.shoppingListElement.appendChild(newListItem);
+        }
+      } else this.createElementForEmptyList();
+    });
+  }
+
   // Events and Bindings
   bindMethods() {
     this.clearErrorMessageElement = this.clearErrorMessageElement.bind(this);
+    this.clearErrorMessageElement = this.clearErrorMessageElement.bind(this);
+    this.deleteItemsFromShoppingList =
+      this.deleteItemsFromShoppingList.bind(this);
   }
 
   addEventListeners() {
@@ -107,6 +132,10 @@ class ShoppingList {
     this.inputFieldElement.addEventListener(
       'input',
       this.clearErrorMessageElement,
+    );
+    this.shoppingListElement.addEventListener(
+      'click',
+      this.deleteItemsFromShoppingList,
     );
   }
 }
