@@ -1,9 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, push, onValue, remove } from 'firebase/database';
 
-import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, push, onValue, remove } from 'firebase/database';
-
 class ShoppingList {
   constructor() {
     this.inputFieldElement = document.querySelector('#input-field');
@@ -23,9 +20,10 @@ class ShoppingList {
     this.bindMethods();
     this.addEventListeners();
   }
+
   // Methods to Create
-  createShoppingListElement(value, key) {
-    let listItem = document.createElement('li');
+  static createShoppingListElement(value, key) {
+    const listItem = document.createElement('li');
 
     listItem.classList.add('add-to-card__item');
     listItem.id = key;
@@ -67,7 +65,7 @@ class ShoppingList {
     event.preventDefault();
 
     if (event.target && event.target.nodeName === 'li') {
-      let locationOfItemInDB = ref(
+      const locationOfItemInDB = ref(
         this.firebaseDatabase,
         `shoppingList/${event.target.id}`,
       );
@@ -80,7 +78,7 @@ class ShoppingList {
   addItemsToShoppingList(event) {
     event.preventDefault();
 
-    let inputValue = this.inputFieldEl.value.trim();
+    const inputValue = this.inputFieldElement.value.trim();
 
     if (inputValue === '') {
       this.clearErrorMessageElement();
@@ -97,18 +95,21 @@ class ShoppingList {
   renderShoppingList() {
     onValue(this.firebaseShoppingListRef, (snapshot) => {
       if (snapshot.exists()) {
-        let snapshotData = snapshot.val();
+        const snapshotData = snapshot.val();
         const emptyElement = document.querySelector('.add-to-card__empty-list');
 
         if (emptyElement) this.shoppingListElement.style.display = 'none';
         this.shoppingListElement.innerHTML = '';
         this.shoppingListElement.style.display = 'flex';
 
-        let itemsArray = Object.entries(snapshotData);
+        const itemsArray = Object.entries(snapshotData);
 
         for (let i = 0; i < itemsArray.length; i += 1) {
-          let [key, value] = itemsArray[i];
-          let newListItem = this.createShoppingListElement(value, key);
+          const [key, value] = itemsArray[i];
+          const newListItem = ShoppingList.createShoppingListElement(
+            value,
+            key,
+          );
 
           this.shoppingListElement.appendChild(newListItem);
         }
@@ -118,7 +119,7 @@ class ShoppingList {
 
   // Events and Bindings
   bindMethods() {
-    this.clearErrorMessageElement = this.clearErrorMessageElement.bind(this);
+    this.addItemsToShoppingList = this.addItemsToShoppingList.bind(this);
     this.clearErrorMessageElement = this.clearErrorMessageElement.bind(this);
     this.deleteItemsFromShoppingList =
       this.deleteItemsFromShoppingList.bind(this);
