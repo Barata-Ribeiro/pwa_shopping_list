@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;500;700&display=swap');
+
+@import './App.css';
+@import './ShoppingList.css';
+
+:root {
+  --font-headings: 'Noto Serif', serif;
+  --font-texts: 'Noto Sans', sans-serif;
+}
+
+.light-theme {
+  --text: hsl(243, 17%, 22%);
+  --background: hsl(220, 21%, 95%);
+  --primary: hsl(349, 41%, 48%);
+  --secondary: hsl(40, 100%, 89%);
+  --secondary-support: hsl(29, 100%, 13%);
+  --accent: hsl(236, 21%, 44%);
+}
+
+.dark-theme {
+  --text: hsl(220, 21%, 95%);
+  --background: hsl(243, 17%, 22%);
+  --primary: hsl(349, 41%, 48%);
+  --secondary: hsl(40, 100%, 9%);
+  --secondary-support: hsl(40, 100%, 89%);
+  --accent: hsl(236, 22%, 74%);
+}
+
+html {
+  font-size: 62.5%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-texts);
+  font-size: 1.6rem;
+  line-height: 1.5;
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+  user-select: none;
+}
