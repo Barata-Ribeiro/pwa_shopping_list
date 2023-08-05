@@ -5,6 +5,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 class ShoppingList {
   constructor() {
     this.loginButtonElement = document.querySelector('#login-button');
+    this.logoutButtonElement = document.querySelector('#logout-button');
     this.inputFieldElement = document.querySelector('#input-field');
     this.addButtonElement = document.querySelector('#add-button');
     this.addButtonElement.disabled = true;
@@ -15,8 +16,11 @@ class ShoppingList {
     this.firebaseConfig = {
       apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
       authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
       databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGE_SENDER_ID,
+      appId: import.meta.env.VITE_FIREBASE_APP_ID,
     };
     this.firebaseApp = initializeApp(this.firebaseConfig);
     this.firebaseDatabase = getDatabase(this.firebaseApp);
@@ -31,9 +35,17 @@ class ShoppingList {
         );
         this.renderShoppingList();
         this.addButtonElement.disabled = false;
+
+        // Show logout button and hide login button
+        this.logoutButtonElement.style.display = 'block';
+        this.loginButtonElement.style.display = 'none';
       } else {
         this.clearShoppingListElement();
         this.addButtonElement.disabled = true;
+
+        // Show login button and hide logout button
+        this.logoutButtonElement.style.display = 'none';
+        this.loginButtonElement.style.display = 'block';
       }
     });
 
@@ -41,6 +53,7 @@ class ShoppingList {
     this.addEventListeners();
   }
 
+  // Firebase Methods
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
@@ -62,6 +75,14 @@ class ShoppingList {
     } catch (error) {
       // Handle any errors that occurred during sign-in.
       console.error('Error during sign-in: ', error);
+    }
+  }
+
+  async logout() {
+    try {
+      await this.firebaseAuth.signOut();
+    } catch (error) {
+      console.error('Error during sign-out: ', error);
     }
   }
 
@@ -182,6 +203,7 @@ class ShoppingList {
     this.deleteItemsFromShoppingList =
       this.deleteItemsFromShoppingList.bind(this);
     this.loginWithGoogle = this.loginWithGoogle.bind(this);
+    this.logout = this.logout.bind(this);
   }
 
   addEventListeners() {
@@ -199,6 +221,9 @@ class ShoppingList {
       this.deleteItemsFromShoppingList,
     );
     this.loginButtonElement.addEventListener('click', this.loginWithGoogle);
+    this.logoutButtonElement.addEventListener('click', async () => {
+      await this.logout();
+    });
   }
 }
 

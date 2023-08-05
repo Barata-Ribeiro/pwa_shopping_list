@@ -7,7 +7,8 @@
   gap: 1.6rem;
 }
 
-.login__button {
+.login__button,
+.logout__button {
   background-color: #007bff;
   color: #fff;
   padding: 1rem 2rem;
@@ -16,7 +17,8 @@
   cursor: pointer;
 }
 
-.login__button:hover {
+.login__button:hover,
+.logout__button:hover {
   background-color: #0056b3;
 }
 

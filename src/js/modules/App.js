@@ -16,6 +16,15 @@ class App {
     loginButtonEl.textContent = 'Login with Google';
     mainContainer.appendChild(loginButtonEl);
 
+    // Logout Button Element
+    const logoutButtonEl = document.createElement('button');
+    logoutButtonEl.className = 'logout__button';
+    logoutButtonEl.id = 'logout-button';
+    logoutButtonEl.type = 'button';
+    logoutButtonEl.textContent = 'Logout';
+    logoutButtonEl.style.display = 'none';
+    mainContainer.appendChild(logoutButtonEl);
+
     // Image Element
     const imageEl = document.createElement('img');
     imageEl.className = 'add-to-cart__image';
