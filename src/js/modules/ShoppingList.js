@@ -10,8 +10,7 @@ class ShoppingList {
 
     // Firebase Properties
     this.firebaseConfig = {
-      databaseURL:
-        'https://shopping-cart-list-f1b57-default-rtdb.firebaseio.com/',
+      databaseURL: import.meta.env.FIREBASE_DATABASE_URL,
     };
     this.firebaseApp = initializeApp(this.firebaseConfig);
     this.firebaseDatabase = getDatabase(this.firebaseApp);
