@@ -13,6 +13,9 @@ class ShoppingList {
     this.errorMessageElement = document.querySelector('#error-message');
     this.shoppingListElement = document.querySelector('#shopping-list');
 
+    this.spinner = ShoppingList.createLoadingSpinner();
+    this.mainContainer.appendChild(this.spinner);
+
     this.modalContainer = document.querySelector('#error-modal-container');
     this.modalErrorMessage = document.querySelector('#modal-error-message');
     this.modalCloseButton = document.querySelector(
@@ -63,10 +66,9 @@ class ShoppingList {
   // Firebase Methods
   async loginWithGoogle() {
     const provider = new GoogleAuthProvider();
-    const auth = getAuth();
 
     try {
-      const result = await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(this.firebaseAuth, provider);
       const { user } = result;
 
       this.userId = user.uid;
@@ -135,8 +137,14 @@ class ShoppingList {
     this.modalContainer.style.display = 'block';
   }
 
-  // Methods to Clear/Delete
+  static createLoadingSpinner() {
+    const spinner = document.createElement('div');
+    spinner.classList.add('loading-spinner');
+    spinner.innerHTML = '<div class="spinner"></div>';
+    return spinner;
+  }
 
+  // Methods to Clear/Delete
   closeModal() {
     this.modalContainer.style.display = 'none';
   }
@@ -187,7 +195,12 @@ class ShoppingList {
     }
 
     if (this.firebaseShoppingListRef) {
-      push(this.firebaseShoppingListRef, inputValue);
+      push(this.firebaseShoppingListRef, inputValue).catch((error) => {
+        this.displayErrorMessage(
+          'Failed to add the item to the shopping list.',
+          error,
+        );
+      });
       this.clearInputFieldElement();
     } else {
       this.displayErrorMessage('User not logged in.');
@@ -195,11 +208,16 @@ class ShoppingList {
   }
 
   renderShoppingList() {
+    this.spinner.style.display = 'flex';
+
     if (this.firebaseShoppingListRef) {
       onValue(this.firebaseShoppingListRef, (snapshot) => {
+        this.spinner.style.display = 'none';
+        this.shoppingListElement.innerHTML = '';
+
         if (snapshot.exists()) {
           const snapshotData = snapshot.val();
-          this.shoppingListElement.innerHTML = '';
+
           this.shoppingListElement.style.display = 'flex';
 
           const itemsArray = Object.entries(snapshotData);
@@ -218,14 +236,21 @@ class ShoppingList {
             '.add-to-cart__empty-list',
           );
           if (emptyElement) emptyElement.remove();
+
+          if (Object.keys(snapshotData).length >= 20) {
+            this.addButtonElement.disabled = true;
+            this.displayErrorMessage('You can only add up to 20 items.');
+          } else {
+            this.addButtonElement.disabled = false;
+          }
         } else {
-          this.shoppingListElement.innerHTML = '';
           this.shoppingListElement.style.display = 'none';
           this.createElementForEmptyList();
         }
       });
     } else {
       this.displayErrorMessage('firebaseShoppingListRef is not defined');
+      this.spinner.style.display = 'none';
     }
   }
 
@@ -253,13 +278,11 @@ class ShoppingList {
       this.clearErrorMessageElement,
     );
     this.shoppingListElement.addEventListener(
-      'click',
+      'dblclick',
       this.deleteItemsFromShoppingList,
     );
     this.loginButtonElement.addEventListener('click', this.loginWithGoogle);
-    this.logoutButtonElement.addEventListener('click', async () => {
-      await this.logout();
-    });
+    this.logoutButtonElement.addEventListener('click', this.logout);
 
     if (this.modalCloseButton) {
       this.modalCloseButton.addEventListener('click', this.closeModal);
