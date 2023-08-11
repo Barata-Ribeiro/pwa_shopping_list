@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;500;700&display=swap');
 
 @import './App.css';
+@import './ThemeSwitcher.css';
 @import './ShoppingList.css';
 @import './Modal.css';
 @import './Loading.css';
