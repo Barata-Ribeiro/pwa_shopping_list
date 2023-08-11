@@ -25,6 +25,24 @@ class App {
     logoutButtonEl.style.display = 'none';
     mainContainer.appendChild(logoutButtonEl);
 
+    // Theme Switcher Toggle Element
+    const themeSwitcherContainerEl = document.createElement('div');
+    themeSwitcherContainerEl.className = 'theme-switcher__container';
+
+    const themeSwitcherEl = document.createElement('input');
+    themeSwitcherEl.className = 'theme-switcher__input';
+    themeSwitcherEl.id = 'theme-switcher';
+    themeSwitcherEl.type = 'checkbox';
+    themeSwitcherEl.addEventListener('change', App.toggleTheme);
+    themeSwitcherContainerEl.appendChild(themeSwitcherEl);
+
+    const themeSwitcherLabelEl = document.createElement('label');
+    themeSwitcherLabelEl.className = 'theme-switcher__label';
+    themeSwitcherLabelEl.htmlFor = 'theme-switcher';
+    themeSwitcherContainerEl.appendChild(themeSwitcherLabelEl);
+
+    mainContainer.appendChild(themeSwitcherContainerEl);
+
     // Image Element
     const imageEl = document.createElement('img');
     imageEl.className = 'add-to-cart__image';
@@ -82,8 +100,47 @@ class App {
     return mainContainer;
   }
 
+  static toggleTheme() {
+    const { body } = document;
+    let newTheme = 'light-theme'; // default to light-theme
+
+    if (
+      body.classList.contains('dark-theme') ||
+      (!body.classList.contains('light-theme') &&
+        !body.classList.contains('dark-theme'))
+    ) {
+      body.classList.remove('dark-theme');
+      body.classList.add('light-theme');
+    } else {
+      body.classList.remove('light-theme');
+      body.classList.add('dark-theme');
+      newTheme = 'dark-theme';
+    }
+
+    // Save the current theme to local storage
+    localStorage.setItem('theme', newTheme);
+  }
+
+  static initializeTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const { body } = document;
+
+    if (savedTheme) {
+      body.classList.add(savedTheme);
+    } else if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    ) {
+      body.classList.add('dark-theme');
+    } else {
+      body.classList.add('light-theme');
+    }
+  }
+
   render() {
     const appElement = document.getElementById(this.containerId);
+
+    App.initializeTheme();
 
     if (appElement) appElement.appendChild(this.createElements());
     else throw new Error(`Element with id '${this.containerId}' not found.`);
